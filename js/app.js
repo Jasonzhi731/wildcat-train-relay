@@ -424,7 +424,6 @@
   function viewFooter() {
     return html`<footer class="foot">
       <p>本站是跑友自發的組隊工具，與新北市政府觀光旅遊局及賽事主辦單位無關。正式報名、規則與費用請以官方公告為準。</p>
-      <p>本站使用 Google Analytics 統計瀏覽人次，不會傳送你填寫的個人資料。</p>
       <p><a href="#admin" class="muted">管理頁</a></p>
     </footer>`;
   }
@@ -966,7 +965,7 @@
       return html`<section class="card narrow">
         <h2>🛠️ 管理頁</h2>
         <form data-form="adminLogin" novalidate>
-          ${field('管理密碼', html`<input name="password" type="password" autocomplete="current-password" required>`, '密碼設定在 Apps Script 的「指令碼屬性」ADMIN_PASSWORD。')}
+          ${field('管理密碼', html`<input name="password" type="password" autocomplete="current-password" required>`)}
           <p class="form-error" role="alert" hidden></p>
           <button class="btn primary big" type="submit">登入</button>
         </form>
