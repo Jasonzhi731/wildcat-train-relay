@@ -243,6 +243,7 @@
           <li><b>資料：</b>姓名、手機、LINE ID、性別、生日月日（只用來查詢驗證，以不可還原的雜湊保存，管理員也看不到）、希望同組的人${c.phase2Open ? '，以及第二階段填寫的資料' : ''}。</li>
           <li><b>誰看得到：</b>姓名、性別、所屬隊伍${shared.length ? '、' + shared.join('、') : ''}會顯示給已報名的人；LINE ID 只有同隊隊友看得到；手機只有管理員看得到。</li>
           <li><b>保存期限：</b>${c.retention}。</li>
+          <li><b>瀏覽統計：</b>本站使用 Google Analytics 統計瀏覽人次（會使用 Cookie），只記錄瀏覽行為，不會傳送你填寫的姓名、手機等資料。</li>
           <li><b>你的權利：</b>可以隨時請管理員查詢、更正或刪除你的資料。不提供資料就無法使用媒合功能。</li>
         </ul>
       </details>
@@ -396,7 +397,7 @@
     state.brandShown = true;
     return html`<header class="top">
       <button class="brand ${animate ? 'animate' : ''}" data-act="home" aria-label="2027 山貓追火車 GOGOGO，回首頁">
-        <img class="logo" src="img/lynx.svg?v=1.1.2" alt="" width="52" height="52">
+        <img class="logo" src="img/lynx.svg?v=1.1.3" alt="" width="52" height="52">
         <span class="wordmark" aria-hidden="true">
           <span class="wm-top"><span class="wm-year">2027</span><span class="wm-name">山貓追火車</span></span>
           <span class="wm-go"><b>GO</b><b>GO</b><b>GO</b></span>
@@ -424,6 +425,7 @@
   function viewFooter() {
     return html`<footer class="foot">
       <p>本站是跑友自發的組隊工具，與新北市政府觀光旅遊局及賽事主辦單位無關。正式報名、規則與費用請以官方公告為準。</p>
+      <p>本站使用 Google Analytics 統計瀏覽人次，不會傳送你填寫的個人資料。</p>
       <p><a href="#admin" class="muted">管理頁</a></p>
     </footer>`;
   }
@@ -451,7 +453,7 @@
     const c = cfg();
     return html`
     <section class="hero card">
-      <img class="hero-art" src="img/hero.svg?v=1.1.2" alt="山貓追著火車在海邊奔跑的插圖" width="360" height="160">
+      <img class="hero-art" src="img/hero.svg?v=1.1.3" alt="山貓追著火車在海邊奔跑的插圖" width="360" height="160">
       <h2>山貓們，一起追火車！</h2>
       <p>在這裡登記、找隊友。等官方報名開放時，各隊隊長就能拿著名單直接去報名。</p>
       ${inviteNotice()}

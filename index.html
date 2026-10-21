@@ -2,13 +2,29 @@
 <html lang="zh-Hant-TW">
 <head>
 <meta charset="utf-8">
+<!-- Google tag (gtag.js)：統計瀏覽人次。
+     本機預覽（localhost）不載入；送出的網址只有路徑，不含 ?join= 邀請碼與 #admin。 -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  (function () {
+    var h = location.hostname;
+    if (h === 'localhost' || h === '127.0.0.1' || h === '') return;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-XT7RXWWJS9';
+    document.head.appendChild(s);
+    gtag('js', new Date());
+    gtag('config', 'G-XT7RXWWJS9', { page_location: location.origin + location.pathname });
+  })();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>2027 山貓追火車 GOGOGO</title>
 <meta name="description" content="2027 山貓追火車 GOGOGO：追火車（新北市鐵道馬拉松接力賽）跑友自發的組隊媒合，非官方報名網站。">
 <meta name="theme-color" content="#1d5fa8">
 <meta name="robots" content="noindex">
-<link rel="icon" type="image/svg+xml" href="img/lynx.svg?v=1.1.2">
-<link rel="stylesheet" href="css/style.css?v=1.1.2">
+<link rel="icon" type="image/svg+xml" href="img/lynx.svg?v=1.1.3">
+<link rel="stylesheet" href="css/style.css?v=1.1.3">
 </head>
 <body>
 <div id="app" class="wrap"><p class="loading-text">載入中…</p></div>
@@ -16,9 +32,9 @@
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 <div id="modal" hidden></div>
 <noscript><p class="wrap">這個網頁需要開啟 JavaScript 才能使用。</p></noscript>
-<script src="js/config.js?v=1.1.2"></script>
-<script src="js/api.js?v=1.1.2"></script>
-<script src="js/app.js?v=1.1.2"></script>
+<script src="js/config.js?v=1.1.3"></script>
+<script src="js/api.js?v=1.1.3"></script>
+<script src="js/app.js?v=1.1.3"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
 </body>
 </html>
