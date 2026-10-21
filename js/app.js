@@ -396,7 +396,7 @@
     state.brandShown = true;
     return html`<header class="top">
       <button class="brand ${animate ? 'animate' : ''}" data-act="home" aria-label="2027 山貓追火車 GOGOGO，回首頁">
-        <img class="logo" src="img/lynx.svg?v=1.1.0" alt="" width="52" height="52">
+        <img class="logo" src="img/lynx.svg?v=1.1.1" alt="" width="52" height="52">
         <span class="wordmark" aria-hidden="true">
           <span class="wm-top"><span class="wm-year">2027</span><span class="wm-name">山貓追火車</span></span>
           <span class="wm-go"><b>GO</b><b>GO</b><b>GO</b></span>
@@ -451,7 +451,7 @@
     const c = cfg();
     return html`
     <section class="hero card">
-      <img class="hero-art" src="img/hero.svg?v=1.1.0" alt="山貓追著火車在海邊奔跑的插圖" width="360" height="160">
+      <img class="hero-art" src="img/hero.svg?v=1.1.1" alt="山貓追著火車在海邊奔跑的插圖" width="360" height="160">
       <h2>山貓們，一起追火車！</h2>
       <p>在這裡登記、找隊友。等官方報名開放時，各隊隊長就能拿著名單直接去報名。</p>
       ${inviteNotice()}

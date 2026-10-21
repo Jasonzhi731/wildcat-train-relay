@@ -206,8 +206,9 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 16px 0; }
   .brand.animate .wm-go b:nth-child(2) { animation-delay: 0.3s; }
   .brand.animate .wm-go b:nth-child(3) { animation-delay: 0.45s; }
 }
-@keyframes logo-in { from { opacity: 0; transform: translateX(-12px) rotate(-12deg); } to { opacity: 1; transform: none; } }
-@keyframes go-in { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+/* 只做位移、不做透明：就算瀏覽器暫停動畫，文字和頭像也一定看得到 */
+@keyframes logo-in { from { transform: translateX(-10px) rotate(-14deg); } to { transform: none; } }
+@keyframes go-in { from { transform: translateX(-8px) scale(0.6); } to { transform: none; } }
 
 .hero-art {
   display: block;
