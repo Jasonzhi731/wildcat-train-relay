@@ -535,6 +535,7 @@ input[type="checkbox"], input[type="radio"] { width: 20px; min-height: 20px; hei
 .stats span { font-size: 0.8rem; color: var(--muted); }
 .search { flex: 1; min-width: 180px; }
 .admin-team .admin-list { margin: 10px 0; }
+.dup { margin-top: 4px; padding: 4px 8px; border-radius: 8px; background: var(--warn-soft); color: var(--warn); font-weight: 600; }
 
 /* ---------- 頁尾 ---------- */
 .foot { margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.82rem; text-align: center; }

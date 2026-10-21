@@ -396,7 +396,7 @@
     state.brandShown = true;
     return html`<header class="top">
       <button class="brand ${animate ? 'animate' : ''}" data-act="home" aria-label="2027 山貓追火車 GOGOGO，回首頁">
-        <img class="logo" src="img/lynx.svg?v=1.1.1" alt="" width="52" height="52">
+        <img class="logo" src="img/lynx.svg?v=1.1.2" alt="" width="52" height="52">
         <span class="wordmark" aria-hidden="true">
           <span class="wm-top"><span class="wm-year">2027</span><span class="wm-name">山貓追火車</span></span>
           <span class="wm-go"><b>GO</b><b>GO</b><b>GO</b></span>
@@ -451,7 +451,7 @@
     const c = cfg();
     return html`
     <section class="hero card">
-      <img class="hero-art" src="img/hero.svg?v=1.1.1" alt="山貓追著火車在海邊奔跑的插圖" width="360" height="160">
+      <img class="hero-art" src="img/hero.svg?v=1.1.2" alt="山貓追著火車在海邊奔跑的插圖" width="360" height="160">
       <h2>山貓們，一起追火車！</h2>
       <p>在這裡登記、找隊友。等官方報名開放時，各隊隊長就能拿著名單直接去報名。</p>
       ${inviteNotice()}
@@ -979,6 +979,7 @@
     const pool = a.members.filter(function (m) { return !m.teamId || !teamById[m.teamId]; });
     const inTeams = a.members.length - pool.length;
     const female = a.members.filter(function (m) { return m.gender === '女'; }).length;
+    const dups = a.members.filter(function (m) { return m.duplicates && m.duplicates.length; }).length;
     return html`
     <section class="card">
       <div class="team-head"><h2>🛠️ 管理頁</h2><button class="link" data-act="leaveAdmin">← 回到報名頁</button></div>
@@ -990,6 +991,7 @@
         <div><b>${female}</b><span>女性</span></div>
         <div><b>${a.pendingCount}</b><span>待回覆申請</span></div>
       </div>
+      ${dups ? html`<p class="notice warn">⚠️ 有 ${dups} 筆報名可能重複（LINE ID 相同或同名），請看下方標示，確認後再用「刪除」移除多的那一筆。</p>` : ''}
       <p class="small muted">開關（開放註冊：${c.registrationOpen ? '✅ 開' : '⛔ 關'}・第二階段：${c.phase2Open ? '✅ 開' : '⛔ 關'}・鎖定隊伍：${c.teamsLocked ? '🔒 已鎖定' : '🔓 未鎖定'}）請到 Google Sheet 的「設定」工作表修改。管理頁的調整不受「鎖定隊伍」限制。</p>
       <div class="stack-row">
         <input class="search" type="search" placeholder="搜尋姓名、電話、隊名…" value="${state.adminQuery}" data-input="adminSearch" aria-label="搜尋">
@@ -1033,6 +1035,7 @@
         ${c.phase2Open && !inPool ? html`<span class="tag leg">${legText(m.leg)}</span>` : ''}
         ${m.loginLocked ? html`<span class="tag warn">🔒 登入暫停中</span>` : ''}
       </div>
+      ${m.duplicates && m.duplicates.length ? html`<div class="small dup">⚠️ 可能重複：${m.duplicates.join('；')}</div>` : ''}
       <div class="small"><span class="mono">${m.phone}</span>・LINE <span class="mono">${m.lineId}</span>・${m.id}・${shortTime(m.createdAt)} 報名</div>
       ${m.wish ? html`<div class="small muted">💭 ${m.wish}</div>` : ''}
       ${summary ? html`<div class="small muted">${summary}</div>` : ''}
@@ -1443,13 +1446,18 @@
     },
   };
 
+  // 防止連點：前一個操作還在處理時，忽略新的按鈕與送出（避免同一份報名送兩次）
+  let working = false;
+
   document.addEventListener('click', async function (ev) {
     const el = ev.target.closest('[data-act]');
     if (!el || el.disabled) return;
     const fn = clicks[el.getAttribute('data-act')];
     if (!fn) return;
     ev.preventDefault();
-    try { await fn(el.dataset, el); } catch (e) { handleError(e); }
+    if (working) return;
+    working = true;
+    try { await fn(el.dataset, el); } catch (e) { handleError(e); } finally { working = false; }
   });
 
   document.addEventListener('submit', async function (ev) {
@@ -1457,10 +1465,20 @@
     if (!form) return;
     ev.preventDefault();
     const fn = forms[form.getAttribute('data-form')];
-    if (!fn) return;
+    if (!fn || working) return;
+    working = true;
+    const btn = form.querySelector('[type="submit"]');
+    if (btn) btn.disabled = true;
     const err = form.querySelector('.form-error');
     if (err) err.hidden = true;
-    try { await fn(form); } catch (e) { handleError(e, form); }
+    try {
+      await fn(form);
+    } catch (e) {
+      handleError(e, form);
+    } finally {
+      working = false;
+      if (btn && btn.isConnected) btn.disabled = false;
+    }
   });
 
   document.addEventListener('change', async function (ev) {

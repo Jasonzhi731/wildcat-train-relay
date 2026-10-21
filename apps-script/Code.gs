@@ -16,7 +16,7 @@
  * 否則隊長、人數等資料可能對不起來。
  */
 
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 const TZ = 'Asia/Taipei';
 const TOKEN_DAYS = 30;          // 登入有效天數
 const ADMIN_TOKEN_HOURS = 12;   // 管理頁登入有效小時
@@ -210,6 +210,17 @@ function handle_(body) {
         lock = null;
         return { ok: false, error: '目前使用的人比較多，請稍後再試一次' };
       }
+    }
+    // 管理員直接在 Sheet 刪掉某人那一列時，自動修正隊長、空隊伍與申請（寫入需要鎖定）
+    if (def.lock || def.auth) {
+      if (!lock && needsRepair_()) {
+        const repairLock = LockService.getScriptLock();
+        if (repairLock.tryLock(10000)) {
+          lock = repairLock;
+          REQ_.tables = {};
+        }
+      }
+      if (lock) repairData_();
     }
     let actor = null;
     if (def.auth === 'member') actor = authMember_(body.token);
@@ -710,6 +721,7 @@ function adminData_() {
       createdAt: m.createdAt, updatedAt: m.updatedAt, adminNote: m.adminNote, loginLocked: !!(lock && lock > now),
     };
     PHASE2_FIELDS.forEach(function (f) { v[f.key] = m[f.key]; });
+    v.duplicates = duplicateHints_(m, ctx.members);
     return v;
   });
   const teams = ctx.activeTeams.map(function (t) {
@@ -721,6 +733,23 @@ function adminData_() {
   });
   const pendingCount = ctx.requests.filter(function (r) { return r.status === ST_PENDING; }).length;
   return { config: publicConfig_(), members: members, teams: teams, pendingCount: pendingCount, serverTime: nowStr_() };
+}
+
+/**
+ * 可能重複報名的提示（只給管理員看，由管理員判斷要不要刪）：
+ * LINE ID 相同（LINE ID 是唯一的，很可能是同一人換了手機號碼報名）、或姓名相同（也可能只是同名）。
+ */
+function duplicateHints_(m, all) {
+  const key = function (s) { return String(s || '').replace(/\s+/g, '').toLowerCase(); };
+  const hints = [];
+  const line = key(m.lineId);
+  const name = key(m.name);
+  all.forEach(function (o) {
+    if (o.id === m.id) return;
+    if (line.length >= 3 && key(o.lineId) === line) hints.push('LINE ID 與 ' + o.id + ' ' + o.name + ' 相同');
+    else if (name && key(o.name) === name) hints.push('與 ' + o.id + ' 同名');
+  });
+  return hints;
 }
 
 // ============================================================
@@ -1225,13 +1254,61 @@ function parseTime_(s) {
   return isNaN(d.getTime()) ? null : d;
 }
 
+/**
+ * 產生新編號。用過的最大號碼記在指令碼屬性，所以就算有人在 Sheet 直接刪掉最後一列，
+ * 編號也不會被重複使用（避免舊的申請、邀請、登入憑證對到新的人）。
+ */
 function nextId_(rows, prefix, width) {
   let max = 0;
   rows.forEach(function (r) {
     const m = /^[A-Z](\d+)$/.exec(r.id);
     if (m) max = Math.max(max, Number(m[1]));
   });
-  return prefix + String(max + 1).padStart(width, '0');
+  const props = PropertiesService.getScriptProperties();
+  const key = 'LAST_ID_' + prefix;
+  max = Math.max(max, Number(props.getProperty(key)) || 0) + 1;
+  props.setProperty(key, String(max));
+  return prefix + String(max).padStart(width, '0');
+}
+
+// ============================================================
+//  自動修正（管理員直接在 Sheet 刪掉成員那一列時）
+// ============================================================
+
+/** 有沒有需要修正的地方（只檢查，不寫入）。 */
+function needsRepair_() {
+  return repairData_(true) > 0;
+}
+
+/**
+ * 修正：隊長不見了 → 交給最早入隊的人；隊伍沒人了 → 解散；角色欄位對不上 → 重新標示；
+ * 申請或邀請的對象已經不在名單上 → 失效。dryRun = true 時只計算數量。
+ */
+function repairData_(dryRun) {
+  let count = 0;
+  table_('teams').rows.forEach(function (t) {
+    if (t.status !== TEAM_ACTIVE) return;
+    const ms = teamMembers_(t.id);
+    const captainOk = ms.some(function (m) { return m.id === t.captainId; });
+    const rolesOk = ms.every(function (m) { return (m.id === t.captainId) === (m.role === ROLE_CAPTAIN); });
+    if (ms.length && captainOk && rolesOk) return;
+    count++;
+    if (dryRun) return;
+    if (!ms.length) {
+      dissolveTeam_(t, '隊員資料已從 Sheet 移除');
+    } else {
+      const captain = captainOk ? memberById_(t.captainId) : ms.slice().sort(byJoined_)[0];
+      setCaptain_(t, captain);
+      if (!captainOk) log_('自動指定隊長', '系統', t.name + '：原隊長資料已從 Sheet 移除，改由 ' + captain.name + ' 擔任');
+    }
+  });
+  pendingRequests_().forEach(function (r) {
+    const gone = (r.type === REQ_JOIN && !memberById_(r.fromMemberId)) || (r.type === REQ_INVITE && !memberById_(r.toMemberId));
+    if (!gone) return;
+    count++;
+    if (!dryRun) decide_(r, ST_EXPIRED, '系統', '成員資料已從 Sheet 移除');
+  });
+  return count;
 }
 
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';

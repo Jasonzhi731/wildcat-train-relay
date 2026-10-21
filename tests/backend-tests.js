@@ -481,6 +481,82 @@
     ok(log.indexOf('建立隊伍') >= 0 && log.indexOf('紀錄隊') >= 0);
   });
 
+  /** 模擬管理員直接在 Google Sheet 把某人那一列刪掉。 */
+  function deleteMemberRowInSheet(id) {
+    const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('成員');
+    const rows = sh.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][0] === id) { sh.deleteRow(i + 1); return; }
+    }
+    throw new Error('找不到成員 ' + id);
+  }
+
+  test('同一支手機不能重複報名（加 -、空白、+886 都算同一支）', function () {
+    const base = { name: '小明', birthday: '0731', lineId: 'ming', gender: '男', consent: true };
+    must('register', Object.assign({ phone: '0912345678' }, base));
+    ['0912345678', '0912-345-678', '0912 345 678', '+886912345678', '886912345678'].forEach(function (p) {
+      const r = mustFail('register', Object.assign({ phone: p }, base), '已經報名過');
+      eq(r.code, 'DUPLICATE');
+    });
+    eq(sheetRows('成員').length, 2, '只有表頭＋1 人');
+  });
+
+  test('直接在 Sheet 刪掉某人：舊登入失效、無法登入、可以用同一支手機重新報名，編號不會重複使用', function () {
+    reg();
+    const u = reg({ phone: '0911000222', birthday: '0505' });
+    deleteMemberRowInSheet(u.id);
+    const r = mustFail('dashboard', { token: u.token }, '找不到');
+    eq(r.code, 'AUTH');
+    mustFail('login', { phone: '0911000222', birthday: '0505' }, '不正確');
+    const again = reg({ phone: '0911000222', birthday: '0606' });
+    ok(again.id !== u.id, '新編號 ' + again.id + ' 不應該等於被刪掉的 ' + u.id);
+    mustFail('dashboard', { token: u.token }, '重新登入');
+  });
+
+  test('直接在 Sheet 刪掉隊長：下一次有人操作時，自動交給最早入隊的人', function () {
+    const a = reg({ name: '隊長' }); const t = team(a);
+    advance(1000);
+    const b = reg({ name: '先入隊', inviteCode: t.inviteCode });
+    advance(1000);
+    const c = reg({ name: '後入隊', inviteCode: t.inviteCode });
+    deleteMemberRowInSheet(a.id);
+    const d = dash(c).myTeam;
+    eq(d.captainId, b.id, '隊長交給先入隊的人');
+    eq(d.size, 2);
+    eq(d.members.find(function (m) { return m.id === b.id; }).role, '隊長');
+    must('respond', { token: b.token, requestId: must('applyJoin', { token: reg().token, teamId: t.id }).dashboard.requests.outgoing[0].id, accept: true });
+    eq(dash(b).myTeam.size, 3, '新隊長可以審核申請');
+    ok(JSON.stringify(sheetRows('紀錄')).indexOf('自動指定隊長') >= 0);
+  });
+
+  test('直接在 Sheet 刪掉整隊的人：隊伍自動解散；對方的申請與邀請自動失效', function () {
+    const a = reg(); const t = team(a);
+    const b = reg(); const tb = team(b);
+    const p = reg();
+    must('invite', { token: b.token, memberId: p.id });
+    must('applyJoin', { token: p.token, teamId: t.id });
+    deleteMemberRowInSheet(a.id);
+    deleteMemberRowInSheet(p.id);
+    const d = dash(b);
+    ok(!d.teams.some(function (x) { return x.id === t.id; }), '沒人的隊伍應該解散');
+    eq(d.requests.outgoing[0].status, '已失效', '對已刪除的人發出的邀請失效');
+    ok(tb.id);
+  });
+
+  test('管理頁標示可能重複的報名（LINE ID 相同、同名）', function () {
+    reg({ name: '王小明', lineId: 'Ming_01' });
+    reg({ name: '王 小明', lineId: 'other' });
+    reg({ name: '另一人', lineId: 'ming_01' });
+    reg({ name: '無關', lineId: 'x' });
+    const data = must('adminData', { adminToken: adminToken() }).data;
+    const byName = {};
+    data.members.forEach(function (m) { byName[m.name] = m.duplicates; });
+    ok(byName['王小明'].some(function (h) { return h.indexOf('LINE ID') >= 0; }), JSON.stringify(byName['王小明']));
+    ok(byName['王小明'].some(function (h) { return h.indexOf('同名') >= 0; }));
+    ok(byName['另一人'].some(function (h) { return h.indexOf('LINE ID') >= 0; }));
+    eq(byName['無關'].length, 0);
+  });
+
   // ---------- 執行 ----------
   const out = document.getElementById('out');
   let pass = 0;
