@@ -22,6 +22,13 @@
 - 新增後端規則時，在 `tests/backend-tests.js` 加測試；不得宣稱未執行的測試已通過。
 - 這台電腦沒有 Node.js：測試與預覽都在瀏覽器執行，伺服器用 PowerShell（`.ps1` 存成 UTF-8 with BOM）。
 
+## 品牌
+- 網站名稱「2027 山貓追火車 GOGOGO」：標題列是固定的設計字樣（`js/app.js` 的 `viewHeader`＋`css/style.css` 的 `.wordmark`），
+  吉祥物 `img/lynx.svg`（也是 favicon）、首頁插圖 `img/hero.svg`。Sheet「設定」的「活動名稱」目前不影響網頁。
+
 ## 部署注意
+- 網站：https://jasonzhi731.github.io/wildcat-train-relay/（GitHub Pages，main 分支根目錄）。
+  本資料夾的 git remote `origin` 指向 `jasonzhi731/wildcat-train-relay`，認證用 Git Credential Manager。
+  使用者要求修改前端時：改完、在瀏覽器確認、commit 後 push（使用者 2026-10-21 要求「自動更新 GitHub」）。
 - 更新 Apps Script 要用「管理部署作業 → 編輯 → 新版本」，不要「新增部署作業」（網址會變）。
 - 更新前端檔案時把 `index.html` 的 `?v=` 版本號加一，避免手機快取舊檔。

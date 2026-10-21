@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>山貓</title>
+  <circle cx="32" cy="32" r="31" fill="#fff4e3"/>
+  <circle cx="32" cy="32" r="31" fill="none" stroke="#e8792b" stroke-width="2"/>
+  <!-- 耳朵與耳尖的黑色簇毛（山貓的特徵） -->
+  <path d="M13 28 L17 8 L29 20 Z" fill="#d9822b"/>
+  <path d="M51 28 L47 8 L35 20 Z" fill="#d9822b"/>
+  <path d="M17.5 22.5 L18.8 13 L25 19.5 Z" fill="#f6b8a8"/>
+  <path d="M46.5 22.5 L45.2 13 L39 19.5 Z" fill="#f6b8a8"/>
+  <path d="M17 8 L15.6 2.5 M47 8 L48.4 2.5" stroke="#2b2118" stroke-width="2.6" stroke-linecap="round"/>
+  <!-- 臉頰的鬃毛 -->
+  <path d="M15 35 L5 45 L13 44.5 L9 52.5 L21 47 Z" fill="#f1ddc0"/>
+  <path d="M49 35 L59 45 L51 44.5 L55 52.5 L43 47 Z" fill="#f1ddc0"/>
+  <!-- 頭 -->
+  <ellipse cx="32" cy="36" rx="19" ry="17" fill="#e9a043"/>
+  <path d="M28 21.5 L29 27 M32 20.5 L32 26.5 M36 21.5 L35 27" stroke="#9a5a1c" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="18.5" cy="39" r="1.3" fill="#9a5a1c"/>
+  <circle cx="45.5" cy="39" r="1.3" fill="#9a5a1c"/>
+  <circle cx="20.5" cy="43" r="1" fill="#9a5a1c"/>
+  <circle cx="43.5" cy="43" r="1" fill="#9a5a1c"/>
+  <!-- 嘴部 -->
+  <ellipse cx="32" cy="44" rx="9.5" ry="6.5" fill="#fff6ea"/>
+  <!-- 眼睛：有點認真、準備衝刺 -->
+  <path d="M20 32 Q24.5 28 28.8 32.4 Q24.5 35.6 20 32 Z" fill="#2b2118"/>
+  <path d="M44 32 Q39.5 28 35.2 32.4 Q39.5 35.6 44 32 Z" fill="#2b2118"/>
+  <circle cx="25.8" cy="31.6" r="1.1" fill="#fff"/>
+  <circle cx="38.2" cy="31.6" r="1.1" fill="#fff"/>
+  <!-- 鼻子與嘴巴 -->
+  <path d="M29.4 39.4 H34.6 L32 42.4 Z" fill="#e0675a"/>
+  <path d="M32 42.4 V44.2 M32 44.2 Q29.5 46.8 27 44.8 M32 44.2 Q34.5 46.8 37 44.8" stroke="#2b2118" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+</svg>

@@ -32,7 +32,7 @@
     view: 'loading', tab: store.get('tab') || 'team', config: null, dash: null,
     token: store.get('token'), adminToken: session.get('adminToken'), admin: null, adminPick: [], adminQuery: '',
     invite: null, inviteInfo: null, inviteError: '', teamsFilter: 'open', welcome: '', fatal: '',
-    lastLoad: 0, dirty: false, prevView: '', prevTab: '',
+    lastLoad: 0, dirty: false, prevView: '', prevTab: '', brandShown: false,
   };
 
   // ============================================================
@@ -391,10 +391,17 @@
     const who = (state.view === 'dashboard' || state.view === 'welcome') && d
       ? html`<div class="who"><span>👤 ${d.me.name}</span><button class="link light" data-act="logout">登出</button></div>`
       : (state.view === 'admin' && state.admin ? html`<div class="who"><span>🛠️ 管理員</span><button class="link light" data-act="adminLogout">登出</button></div>` : '');
+    // 標題字樣只在第一次顯示時播放動畫，之後畫面更新不再重播
+    const animate = !state.brandShown;
+    state.brandShown = true;
     return html`<header class="top">
-      <button class="brand" data-act="home" aria-label="回首頁">
-        <span class="logo" aria-hidden="true">🚆</span>
-        <span class="brand-text"><span class="title">${c.eventName || '追火車組隊媒合'}</span><span class="sub">跑友自發組隊・非官方報名網站</span></span>
+      <button class="brand ${animate ? 'animate' : ''}" data-act="home" aria-label="2027 山貓追火車 GOGOGO，回首頁">
+        <img class="logo" src="img/lynx.svg?v=1.1.0" alt="" width="52" height="52">
+        <span class="wordmark" aria-hidden="true">
+          <span class="wm-top"><span class="wm-year">2027</span><span class="wm-name">山貓追火車</span></span>
+          <span class="wm-go"><b>GO</b><b>GO</b><b>GO</b></span>
+          <span class="sub">跑友自發組隊・非官方報名網站</span>
+        </span>
       </button>
       ${who}
     </header>
@@ -444,8 +451,9 @@
     const c = cfg();
     return html`
     <section class="hero card">
-      <h2>一起追火車！先找到隊友</h2>
-      <p>在這裡登記、組隊。等官方報名開放時，各隊隊長就能拿著名單直接去報名。</p>
+      <img class="hero-art" src="img/hero.svg?v=1.1.0" alt="山貓追著火車在海邊奔跑的插圖" width="360" height="160">
+      <h2>山貓們，一起追火車！</h2>
+      <p>在這裡登記、找隊友。等官方報名開放時，各隊隊長就能拿著名單直接去報名。</p>
       ${inviteNotice()}
       <div class="stack">
         ${c.registrationOpen
@@ -571,7 +579,7 @@
     const c = cfg();
     const t = d.myTeam;
     const link = inviteLink(t.inviteCode);
-    const shareText = '一起來跑追火車！點這個連結報名，就會加入「' + t.name + '」：' + link;
+    const shareText = '2027 山貓追火車 GOGOGO！點這個連結報名，就會加入「' + t.name + '」：' + link;
     const incoming = d.requests.incoming;
     const outgoing = d.requests.outgoing;
     return html`
