@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>後端測試</title>
+<style>
+  body { font-family: system-ui, "Microsoft JhengHei", sans-serif; margin: 24px; background: #f6f7f9; color: #1b2430; }
+  h1 { font-size: 20px; }
+  #summary { font-size: 18px; font-weight: 700; padding: 8px 12px; border-radius: 8px; display: inline-block; }
+  #summary.pass { background: #e3f4ea; color: #1e6b3f; }
+  #summary.fail { background: #fdecea; color: #a12b1f; }
+  ul { list-style: none; padding: 0; }
+  li { padding: 6px 0; border-bottom: 1px solid #e3e7ec; }
+  li.fail { color: #a12b1f; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>追火車組隊媒合 — 後端自動測試</h1>
+<p>使用模擬的 Google 環境執行 <code>apps-script/Code.gs</code>，不會連到真的 Google Sheet。</p>
+<p id="summary">執行中…</p>
+<ul id="out"></ul>
+<script src="../dev/mock-gas.js"></script>
+<script src="../apps-script/Code.gs"></script>
+<script src="backend-tests.js"></script>
+</body>
+</html>
